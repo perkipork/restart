@@ -11,6 +11,7 @@
 
     <title>restart?</title>
 
+
     <style>
 
         /* ------------------------------
@@ -282,6 +283,7 @@
 
         .your-move {
             margin-top: 18px !important;
+
             margin-bottom: 0;
 
             font-size: 15px;
@@ -358,7 +360,9 @@
         }
 
     </style>
+
 </head>
+
 
 
 <body>
@@ -388,6 +392,7 @@
         ================================= -->
 
         <section id="screen1">
+
 
             <div class="symbol">
                 ↻
@@ -426,6 +431,7 @@
                 no thanks
             </button>
 
+
         </section>
 
 
@@ -438,6 +444,7 @@
             id="screen2"
             class="hidden"
         >
+
 
             <div class="heart-row">
 
@@ -491,6 +498,7 @@
                 restart friendship
             </button>
 
+
         </section>
 
 
@@ -503,6 +511,7 @@
             id="screen3"
             class="hidden"
         >
+
 
             <div class="pixel-rupee"></div>
 
@@ -553,6 +562,7 @@
 
             </div>
 
+
         </section>
 
 
@@ -565,6 +575,7 @@
             id="screenNo"
             class="hidden"
         >
+
 
             <div class="symbol">
                 🤍
@@ -586,6 +597,7 @@
                 wish you all the best!
             </p>
 
+
         </section>
 
 
@@ -594,7 +606,7 @@
 
 
     <!-- =================================
-         AUDIO FILES
+         AUDIO
     ================================= -->
 
     <audio
@@ -621,14 +633,134 @@
 
 
         /* ------------------------------
-           MUSIC VARIABLES
+           AUDIO VARIABLES
         ------------------------------ */
 
         let musicEnabled = true;
 
         let musicStarted = false;
 
-        let musicFadeInterval;
+        let audioContext = null;
+
+        let restartGain = null;
+
+        let musicGain = null;
+
+        let audioGraphReady = false;
+
+
+
+        /* ------------------------------
+           SET UP MOBILE-SAFE AUDIO
+        ------------------------------ */
+
+        function setupAudioGraph() {
+
+
+            if (audioGraphReady) {
+
+                return true;
+
+            }
+
+
+            try {
+
+
+                const AudioContextClass =
+                    window.AudioContext ||
+                    window.webkitAudioContext;
+
+
+                if (!AudioContextClass) {
+
+                    return false;
+
+                }
+
+
+                audioContext =
+                    new AudioContextClass();
+
+
+                const restartSound =
+                    document.getElementById(
+                        "restartSound"
+                    );
+
+
+                const backgroundMusic =
+                    document.getElementById(
+                        "backgroundMusic"
+                    );
+
+
+                const restartSource =
+                    audioContext
+                        .createMediaElementSource(
+                            restartSound
+                        );
+
+
+                const musicSource =
+                    audioContext
+                        .createMediaElementSource(
+                            backgroundMusic
+                        );
+
+
+                restartGain =
+                    audioContext.createGain();
+
+
+                musicGain =
+                    audioContext.createGain();
+
+
+                restartGain.gain.value =
+                    0.35;
+
+
+                musicGain.gain.value =
+                    0;
+
+
+                restartSource
+                    .connect(restartGain)
+                    .connect(
+                        audioContext.destination
+                    );
+
+
+                musicSource
+                    .connect(musicGain)
+                    .connect(
+                        audioContext.destination
+                    );
+
+
+                audioGraphReady = true;
+
+
+                return true;
+
+
+            }
+
+            catch (error) {
+
+
+                console.log(
+                    "Web Audio unavailable:",
+                    error
+                );
+
+
+                return false;
+
+            }
+
+        }
 
 
 
@@ -638,30 +770,20 @@
 
         function showScreen(screenId) {
 
+
             const card =
                 document.querySelector(".card");
+
 
             const screens =
                 document.querySelectorAll("section");
 
 
-            /*
-                Fade current card out
-            */
-
             card.classList.add("fading");
 
 
-            /*
-                Wait for fade-out
-            */
-
             setTimeout(function() {
 
-
-                /*
-                    Hide every screen
-                */
 
                 screens.forEach(function(screen) {
 
@@ -670,18 +792,10 @@
                 });
 
 
-                /*
-                    Show requested screen
-                */
-
                 document
                     .getElementById(screenId)
                     .classList.remove("hidden");
 
-
-                /*
-                    Fade new screen in
-                */
 
                 requestAnimationFrame(function() {
 
@@ -697,110 +811,178 @@
 
 
         /* ------------------------------
-           MAYBE / RESTART BUTTON
+           MAYBE BUTTON
         ------------------------------ */
 
         function restartFriendship() {
 
+
             const restartSound =
-                document.getElementById("restartSound");
+                document.getElementById(
+                    "restartSound"
+                );
+
 
             const backgroundMusic =
-                document.getElementById("backgroundMusic");
+                document.getElementById(
+                    "backgroundMusic"
+                );
 
-
-            /*
-                Background music is now
-                allowed to play.
-            */
 
             musicStarted = true;
 
 
-            /*
-                Start background music SILENTLY
-                during the user's tap.
+            const webAudioReady =
+                setupAudioGraph();
 
-                This helps mobile browsers allow it.
+
+            /*
+                Resume the audio engine
+                from the actual button tap.
             */
 
-            if (musicEnabled) {
+            if (
+                webAudioReady &&
+                audioContext.state === "suspended"
+            ) {
 
-                backgroundMusic.volume = 0;
-
-                backgroundMusic.play().catch(function() {
-
-                    /*
-                        If a browser refuses playback,
-                        do nothing instead of breaking
-                        the rest of the website.
-                    */
-
-                });
+                audioContext.resume();
 
             }
 
 
             /*
-                Play the restart sound.
+                Reset the little restart sound.
             */
 
-            restartSound.volume = 0.35;
+            restartSound.pause();
 
             restartSound.currentTime = 0;
 
 
             /*
-                Once the restart sound finishes,
-                fade in the background music.
+                Prepare the music.
+
+                On mobile, the song starts
+                silently during the button tap.
+
+                The GainNode — not the phone's
+                media volume control — keeps
+                it inaudible.
             */
 
-            restartSound.onended = function() {
+            if (musicEnabled) {
 
-                if (musicEnabled) {
 
-                    /*
-                        Small pause after the sound
-                        so the two audio moments
-                        feel separate.
-                    */
+                backgroundMusic.pause();
 
-                    setTimeout(function() {
+                backgroundMusic.currentTime = 0;
 
-                        fadeInMusic(backgroundMusic);
 
-                    }, 350);
+                if (webAudioReady) {
+
+
+                    musicGain.gain
+                        .cancelScheduledValues(
+                            audioContext.currentTime
+                        );
+
+
+                    musicGain.gain
+                        .setValueAtTime(
+                            0,
+                            audioContext.currentTime
+                        );
+
 
                 }
 
-            };
+                else {
+
+
+                    backgroundMusic.volume = 0;
+
+                }
+
+
+                backgroundMusic
+                    .play()
+                    .catch(function() {
+
+                        /*
+                            Don't break the site
+                            if playback is refused.
+                        */
+
+                    });
+
+            }
 
 
             /*
-                Play the restart sound.
+                When the click sound finishes,
+                wait a tiny beat and then
+                bring in the background music.
             */
 
-            restartSound.play().catch(function() {
+            restartSound.onended =
+                function() {
 
-                /*
-                    If the sound cannot play,
-                    don't break the page.
 
-                    Start music after a short delay
-                    instead.
-                */
+                    if (!musicEnabled) {
 
-                if (musicEnabled) {
+                        return;
+
+                    }
+
 
                     setTimeout(function() {
 
-                        fadeInMusic(backgroundMusic);
 
-                    }, 500);
+                        startBackgroundMusic();
 
-                }
 
-            });
+                    }, 350);
+
+                };
+
+
+            /*
+                Play the click sound.
+            */
+
+            if (!webAudioReady) {
+
+                restartSound.volume = 0.35;
+
+            }
+
+
+            restartSound
+                .play()
+                .catch(function() {
+
+
+                    /*
+                        If the confirmation sound
+                        fails, still let the music
+                        begin afterward.
+                    */
+
+                    if (musicEnabled) {
+
+
+                        setTimeout(function() {
+
+
+                            startBackgroundMusic();
+
+
+                        }, 500);
+
+                    }
+
+                });
 
 
             /*
@@ -814,32 +996,186 @@
 
 
         /* ------------------------------
+           START / FADE BACKGROUND MUSIC
+        ------------------------------ */
+
+        function startBackgroundMusic() {
+
+
+            const backgroundMusic =
+                document.getElementById(
+                    "backgroundMusic"
+                );
+
+
+            if (
+                !musicEnabled ||
+                !musicStarted
+            ) {
+
+                return;
+
+            }
+
+
+            /*
+                Restart the song from
+                its actual beginning now
+                that the click sound is over.
+            */
+
+            backgroundMusic.currentTime = 0;
+
+
+            /*
+                WEB AUDIO VERSION
+            */
+
+            if (
+                audioGraphReady &&
+                audioContext
+            ) {
+
+
+                const now =
+                    audioContext.currentTime;
+
+
+                musicGain.gain
+                    .cancelScheduledValues(now);
+
+
+                musicGain.gain
+                    .setValueAtTime(
+                        0,
+                        now
+                    );
+
+
+                /*
+                    Fade from silence to
+                    25% over 3 seconds.
+                */
+
+                musicGain.gain
+                    .linearRampToValueAtTime(
+                        0.25,
+                        now + 3
+                    );
+
+
+                backgroundMusic
+                    .play()
+                    .catch(function() {
+
+                    });
+
+            }
+
+
+            /*
+                FALLBACK VERSION
+            */
+
+            else {
+
+
+                backgroundMusic.volume = 0;
+
+
+                backgroundMusic
+                    .play()
+                    .catch(function() {
+
+                    });
+
+
+                fadeInMusicFallback(
+                    backgroundMusic
+                );
+
+            }
+
+        }
+
+
+
+        /* ------------------------------
            MUSIC ON / OFF
         ------------------------------ */
 
         function toggleMusic() {
 
+
             const backgroundMusic =
-                document.getElementById("backgroundMusic");
+                document.getElementById(
+                    "backgroundMusic"
+                );
+
 
             const musicToggle =
-                document.getElementById("musicToggle");
+                document.getElementById(
+                    "musicToggle"
+                );
 
 
-            musicEnabled = !musicEnabled;
+            musicEnabled =
+                !musicEnabled;
 
 
-            /*
-                MUSIC OFF
-            */
+            const webAudioReady =
+                setupAudioGraph();
+
+
+            if (
+                webAudioReady &&
+                audioContext.state === "suspended"
+            ) {
+
+                audioContext.resume();
+
+            }
+
+
+
+            /* MUSIC OFF */
 
             if (!musicEnabled) {
 
-                clearInterval(musicFadeInterval);
+
+                if (webAudioReady) {
+
+
+                    const now =
+                        audioContext.currentTime;
+
+
+                    musicGain.gain
+                        .cancelScheduledValues(now);
+
+
+                    musicGain.gain
+                        .setValueAtTime(
+                            0,
+                            now
+                        );
+
+                }
+
+                else {
+
+
+                    backgroundMusic.volume = 0;
+
+                }
+
 
                 backgroundMusic.pause();
 
-                musicToggle.textContent = "♪ off";
+
+                musicToggle.textContent =
+                    "♪ off";
+
 
                 musicToggle.setAttribute(
                     "aria-pressed",
@@ -849,13 +1185,15 @@
             }
 
 
-            /*
-                MUSIC ON
-            */
+
+            /* MUSIC ON */
 
             else {
 
-                musicToggle.textContent = "♪ on";
+
+                musicToggle.textContent =
+                    "♪ on";
+
 
                 musicToggle.setAttribute(
                     "aria-pressed",
@@ -863,31 +1201,10 @@
                 );
 
 
-                /*
-                    Only begin music if
-                    "maybe..." has already
-                    been clicked.
-                */
-
                 if (musicStarted) {
 
-                    backgroundMusic.volume = 0;
 
-                    backgroundMusic
-                        .play()
-                        .then(function() {
-
-                            fadeInMusic(backgroundMusic);
-
-                        })
-                        .catch(function() {
-
-                            /*
-                                Do nothing if browser
-                                refuses playback.
-                            */
-
-                        });
+                    startBackgroundMusic();
 
                 }
 
@@ -898,50 +1215,39 @@
 
 
         /* ------------------------------
-           MUSIC FADE-IN
+           FALLBACK MUSIC FADE
         ------------------------------ */
 
-        function fadeInMusic(music) {
-
-            clearInterval(musicFadeInterval);
+        function fadeInMusicFallback(music) {
 
 
-            /*
-                Final volume = 25%
-            */
-
-            const targetVolume = 0.25;
+            const targetVolume =
+                0.25;
 
 
-            /*
-                Fade takes 3 seconds
-            */
-
-            const fadeDuration = 3000;
+            const fadeDuration =
+                3000;
 
 
-            /*
-                50 small volume changes
-            */
-
-            const steps = 50;
+            const steps =
+                50;
 
 
-            let currentStep = 0;
+            let currentStep =
+                0;
 
 
-            musicFadeInterval =
+            const interval =
                 setInterval(function() {
 
 
-                    /*
-                        Stop immediately if
-                        music gets turned off.
-                    */
-
                     if (!musicEnabled) {
 
-                        clearInterval(musicFadeInterval);
+
+                        clearInterval(
+                            interval
+                        );
+
 
                         return;
 
@@ -953,20 +1259,23 @@
 
                     music.volume =
                         targetVolume *
-                        (currentStep / steps);
+                        (
+                            currentStep /
+                            steps
+                        );
 
 
-                    /*
-                        Stop at target volume.
-                    */
+                    if (
+                        currentStep >= steps
+                    ) {
 
-                    if (currentStep >= steps) {
 
                         music.volume =
                             targetVolume;
 
+
                         clearInterval(
-                            musicFadeInterval
+                            interval
                         );
 
                     }
@@ -979,15 +1288,17 @@
 
 
         /* ------------------------------
-           FINAL "YOUR MOVE" REVEAL
+           FINAL MESSAGE REVEAL
         ------------------------------ */
 
         function revealMessage() {
+
 
             const reveal =
                 document.getElementById(
                     "finalReveal"
                 );
+
 
             const button =
                 document.getElementById(
@@ -995,18 +1306,14 @@
                 );
 
 
-            /*
-                Hide button
-            */
-
-            button.classList.add("hidden");
+            button.classList.add(
+                "hidden"
+            );
 
 
-            /*
-                Reveal final message
-            */
-
-            reveal.classList.remove("hidden");
+            reveal.classList.remove(
+                "hidden"
+            );
 
         }
 
