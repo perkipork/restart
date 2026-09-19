@@ -734,56 +734,81 @@
 
         function restartFriendship() {
 
+    const restartSound =
+        document.getElementById("restartSound");
 
-            const restartSound =
-                document.getElementById("restartSound");
-
-
-            const backgroundMusic =
-                document.getElementById("backgroundMusic");
+    const backgroundMusic =
+        document.getElementById("backgroundMusic");
 
 
-            /*
-                Play little game sound
-            */
+    /*
+        Prepare the background music
+        at complete silence.
+    */
 
-            restartSound.volume = 0.35;
-
-            restartSound.currentTime = 0;
-
-            restartSound.play();
+    backgroundMusic.volume = 0;
 
 
-            /*
-                Fade to Screen 2
-            */
+    /*
+        Mark music as started so the
+        on/off button still works.
+    */
 
-            showScreen("screen2");
-
-
-            /*
-                Background music is now
-                allowed to begin
-            */
-
-            musicStarted = true;
+    musicStarted = true;
 
 
-            /*
-                Only play it if the
-                visitor has music turned on
-            */
+    /*
+        Start the background track silently.
 
-            if (musicEnabled) {
+        We do this during the actual button
+        click because mobile browsers prefer
+        audio to begin from a user interaction.
+    */
 
-                backgroundMusic.volume = 0;
+    if (musicEnabled) {
 
-                backgroundMusic.play();
+        backgroundMusic.play();
 
-                fadeInMusic(backgroundMusic);
+    }
 
-            }
 
+    /*
+        Play our little confirmation sound.
+    */
+
+    restartSound.volume = 0.35;
+
+    restartSound.currentTime = 0;
+
+    restartSound.play();
+
+
+    /*
+        Change to Screen 2.
+    */
+
+    showScreen("screen2");
+
+
+    /*
+        IMPORTANT:
+
+        Don't make the background music
+        audible until the restart sound
+        has completely finished.
+    */
+
+    restartSound.onended = function() {
+
+        if (musicEnabled) {
+
+            fadeInMusic(backgroundMusic);
+
+        }
+
+    };
+
+}
         }
 
 
