@@ -11,7 +11,6 @@
 
     <title>restart?</title>
 
-
     <style>
 
         /* ------------------------------
@@ -262,7 +261,7 @@
 
 
         /* ------------------------------
-           FINAL "YOUR MOVE" REVEAL
+           FINAL MESSAGE REVEAL
         ------------------------------ */
 
         .final-reveal {
@@ -283,7 +282,6 @@
 
         .your-move {
             margin-top: 18px !important;
-
             margin-bottom: 0;
 
             font-size: 15px;
@@ -360,16 +358,14 @@
         }
 
     </style>
-
 </head>
-
 
 
 <body>
 
 
     <!-- =================================
-         MUSIC ON / OFF
+         MUSIC CONTROL
     ================================= -->
 
     <button
@@ -377,6 +373,7 @@
         class="music-toggle"
         onclick="toggleMusic()"
         aria-label="Turn background music on or off"
+        aria-pressed="true"
     >
         ♪ on
     </button>
@@ -391,7 +388,6 @@
         ================================= -->
 
         <section id="screen1">
-
 
             <div class="symbol">
                 ↻
@@ -430,7 +426,6 @@
                 no thanks
             </button>
 
-
         </section>
 
 
@@ -443,7 +438,6 @@
             id="screen2"
             class="hidden"
         >
-
 
             <div class="heart-row">
 
@@ -481,21 +475,21 @@
             <p>
                 I'm not trying to restart anything romantic
                 or asking you to wait for me.
-                I'm choosing to stay single & focus on myself, but...
+                I'm choosing to stay single & focus on myself.
             </p>
 
 
             <p>
-                I think you were right about our paths crossing for a reason &
+                but I think you were right about our paths crossing for a reason &
                 if friendship is something you'd want too,
-                I'd like the chance to start over.
+                I'd like the chance to start over
+                (maybe just with clearer boundaries this time?).
             </p>
 
 
             <button onclick="showScreen('screen3')">
                 restart friendship
             </button>
-
 
         </section>
 
@@ -509,7 +503,6 @@
             id="screen3"
             class="hidden"
         >
-
 
             <div class="pixel-rupee"></div>
 
@@ -535,13 +528,6 @@
             </p>
 
 
-            <!--
-                Clicking this does NOT notify you
-                or send anything.
-
-                It simply reveals the final message.
-            -->
-
             <button
                 id="revealButton"
                 onclick="revealMessage()"
@@ -562,11 +548,10 @@
 
 
                 <p class="your-move">
-                    your move ^^
+                    your move :)
                 </p>
 
             </div>
-
 
         </section>
 
@@ -580,7 +565,6 @@
             id="screenNo"
             class="hidden"
         >
-
 
             <div class="symbol">
                 🤍
@@ -602,7 +586,6 @@
                 wish you all the best!
             </p>
 
-
         </section>
 
 
@@ -611,9 +594,8 @@
 
 
     <!-- =================================
-         AUDIO
+         AUDIO FILES
     ================================= -->
-
 
     <audio
         id="restartSound"
@@ -638,25 +620,13 @@
     <script>
 
 
-        /*
-            Keeps track of whether
-            background music is allowed.
-        */
+        /* ------------------------------
+           MUSIC VARIABLES
+        ------------------------------ */
 
         let musicEnabled = true;
 
-
-        /*
-            Keeps track of whether the
-            background song has started.
-        */
-
         let musicStarted = false;
-
-
-        /*
-            Stores our music fade timer.
-        */
 
         let musicFadeInterval;
 
@@ -668,10 +638,8 @@
 
         function showScreen(screenId) {
 
-
             const card =
                 document.querySelector(".card");
-
 
             const screens =
                 document.querySelectorAll("section");
@@ -729,86 +697,119 @@
 
 
         /* ------------------------------
-           RESTART FRIENDSHIP BUTTON
+           MAYBE / RESTART BUTTON
         ------------------------------ */
 
         function restartFriendship() {
 
-    const restartSound =
-        document.getElementById("restartSound");
+            const restartSound =
+                document.getElementById("restartSound");
 
-    const backgroundMusic =
-        document.getElementById("backgroundMusic");
-
-
-    /*
-        Prepare the background music
-        at complete silence.
-    */
-
-    backgroundMusic.volume = 0;
+            const backgroundMusic =
+                document.getElementById("backgroundMusic");
 
 
-    /*
-        Mark music as started so the
-        on/off button still works.
-    */
+            /*
+                Background music is now
+                allowed to play.
+            */
 
-    musicStarted = true;
-
-
-    /*
-        Start the background track silently.
-
-        We do this during the actual button
-        click because mobile browsers prefer
-        audio to begin from a user interaction.
-    */
-
-    if (musicEnabled) {
-
-        backgroundMusic.play();
-
-    }
+            musicStarted = true;
 
 
-    /*
-        Play our little confirmation sound.
-    */
+            /*
+                Start background music SILENTLY
+                during the user's tap.
 
-    restartSound.volume = 0.35;
+                This helps mobile browsers allow it.
+            */
 
-    restartSound.currentTime = 0;
+            if (musicEnabled) {
 
-    restartSound.play();
+                backgroundMusic.volume = 0;
+
+                backgroundMusic.play().catch(function() {
+
+                    /*
+                        If a browser refuses playback,
+                        do nothing instead of breaking
+                        the rest of the website.
+                    */
+
+                });
+
+            }
 
 
-    /*
-        Change to Screen 2.
-    */
+            /*
+                Play the restart sound.
+            */
 
-    showScreen("screen2");
+            restartSound.volume = 0.35;
+
+            restartSound.currentTime = 0;
 
 
-    /*
-        IMPORTANT:
+            /*
+                Once the restart sound finishes,
+                fade in the background music.
+            */
 
-        Don't make the background music
-        audible until the restart sound
-        has completely finished.
-    */
+            restartSound.onended = function() {
 
-    restartSound.onended = function() {
+                if (musicEnabled) {
 
-        if (musicEnabled) {
+                    /*
+                        Small pause after the sound
+                        so the two audio moments
+                        feel separate.
+                    */
 
-            fadeInMusic(backgroundMusic);
+                    setTimeout(function() {
+
+                        fadeInMusic(backgroundMusic);
+
+                    }, 350);
+
+                }
+
+            };
+
+
+            /*
+                Play the restart sound.
+            */
+
+            restartSound.play().catch(function() {
+
+                /*
+                    If the sound cannot play,
+                    don't break the page.
+
+                    Start music after a short delay
+                    instead.
+                */
+
+                if (musicEnabled) {
+
+                    setTimeout(function() {
+
+                        fadeInMusic(backgroundMusic);
+
+                    }, 500);
+
+                }
+
+            });
+
+
+            /*
+                Move to Screen 2.
+            */
+
+            showScreen("screen2");
 
         }
-
-    };
-
-}
 
 
 
@@ -818,10 +819,8 @@
 
         function toggleMusic() {
 
-
             const backgroundMusic =
                 document.getElementById("backgroundMusic");
-
 
             const musicToggle =
                 document.getElementById("musicToggle");
@@ -830,24 +829,24 @@
             musicEnabled = !musicEnabled;
 
 
-
             /*
                 MUSIC OFF
             */
 
             if (!musicEnabled) {
 
-
                 clearInterval(musicFadeInterval);
-
 
                 backgroundMusic.pause();
 
-
                 musicToggle.textContent = "♪ off";
 
-            }
+                musicToggle.setAttribute(
+                    "aria-pressed",
+                    "false"
+                );
 
+            }
 
 
             /*
@@ -856,26 +855,39 @@
 
             else {
 
-
                 musicToggle.textContent = "♪ on";
+
+                musicToggle.setAttribute(
+                    "aria-pressed",
+                    "true"
+                );
 
 
                 /*
-                    Don't start the music
-                    until the visitor has
-                    clicked "maybe..."
+                    Only begin music if
+                    "maybe..." has already
+                    been clicked.
                 */
 
                 if (musicStarted) {
 
-
                     backgroundMusic.volume = 0;
 
+                    backgroundMusic
+                        .play()
+                        .then(function() {
 
-                    backgroundMusic.play();
+                            fadeInMusic(backgroundMusic);
 
+                        })
+                        .catch(function() {
 
-                    fadeInMusic(backgroundMusic);
+                            /*
+                                Do nothing if browser
+                                refuses playback.
+                            */
+
+                        });
 
                 }
 
@@ -891,15 +903,26 @@
 
         function fadeInMusic(music) {
 
-
             clearInterval(musicFadeInterval);
 
+
+            /*
+                Final volume = 25%
+            */
 
             const targetVolume = 0.25;
 
 
+            /*
+                Fade takes 3 seconds
+            */
+
             const fadeDuration = 3000;
 
+
+            /*
+                50 small volume changes
+            */
 
             const steps = 50;
 
@@ -907,14 +930,13 @@
             let currentStep = 0;
 
 
-
             musicFadeInterval =
                 setInterval(function() {
 
 
                     /*
-                        Stop fade if music
-                        gets turned off
+                        Stop immediately if
+                        music gets turned off.
                     */
 
                     if (!musicEnabled) {
@@ -935,14 +957,17 @@
 
 
                     /*
-                        Stop at 25%
+                        Stop at target volume.
                     */
 
                     if (currentStep >= steps) {
 
-                        music.volume = targetVolume;
+                        music.volume =
+                            targetVolume;
 
-                        clearInterval(musicFadeInterval);
+                        clearInterval(
+                            musicFadeInterval
+                        );
 
                     }
 
@@ -954,22 +979,24 @@
 
 
         /* ------------------------------
-           FINAL MESSAGE REVEAL
+           FINAL "YOUR MOVE" REVEAL
         ------------------------------ */
 
         function revealMessage() {
 
-
             const reveal =
-                document.getElementById("finalReveal");
-
+                document.getElementById(
+                    "finalReveal"
+                );
 
             const button =
-                document.getElementById("revealButton");
+                document.getElementById(
+                    "revealButton"
+                );
 
 
             /*
-                Hide "one more thing"
+                Hide button
             */
 
             button.classList.add("hidden");
