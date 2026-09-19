@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>restart?</title>
+
+
+    <style>
+
+        /* ------------------------------
+           FONT
+        ------------------------------ */
+
+        @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap');
+
+
+        /* ------------------------------
+           WHOLE PAGE
+        ------------------------------ */
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            background: #92a798;
+
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 400;
+
+            color: #28414c;
+        }
+
+
+        /* ------------------------------
+           MAIN WHITE CARD
+        ------------------------------ */
+
+        .card {
+            width: 90%;
+            max-width: 500px;
+
+            background: white;
+
+            padding: 40px;
+
+            border-radius: 33px;
+
+            text-align: center;
+
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+
+            box-sizing: border-box;
+
+            transition:
+                opacity 0.3s ease,
+                transform 0.3s ease;
+        }
+
+
+        .card.fading {
+            opacity: 0;
+
+            transform:
+                translateY(5px)
+                scale(0.99);
+        }
+
+
+        /* ------------------------------
+           NORMAL SYMBOL
+        ------------------------------ */
+
+        .symbol {
+            font-size: 60px;
+            margin-bottom: 10px;
+        }
+
+
+        /* ------------------------------
+           HEADINGS
+        ------------------------------ */
+
+        h1 {
+            font-size: 32px;
+
+            margin-top: 0;
+            margin-bottom: 20px;
+
+            font-weight: 500;
+
+            color: #28414c;
+        }
+
+
+        /* ------------------------------
+           PARAGRAPHS
+        ------------------------------ */
+
+        p {
+            font-size: 18px;
+
+            line-height: 1.6;
+
+            color: #4f5d63;
+
+            font-weight: 300;
+
+            margin-bottom: 14px;
+        }
+
+
+        /* ------------------------------
+           MAIN BUTTONS
+        ------------------------------ */
+
+        button {
+            display: block;
+
+            width: 100%;
+
+            margin-top: 15px;
+
+            padding: 15px;
+
+            border: none;
+
+            border-radius: 22px;
+
+            font-size: 16px;
+
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 500;
+
+            cursor: pointer;
+
+            background: #616e74;
+
+            color: white;
+
+            transition:
+                opacity 0.2s ease,
+                transform 0.2s ease;
+        }
+
+
+        button:hover {
+            opacity: 0.8;
+        }
+
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+
+        .secondary {
+            background: #eeeeee;
+            color: #444;
+        }
+
+
+        /* ------------------------------
+           TINY MUSIC CONTROL
+        ------------------------------ */
+
+        .music-toggle {
+            position: fixed;
+
+            top: 16px;
+            right: 16px;
+
+            width: auto;
+
+            margin: 0;
+
+            padding: 7px 11px;
+
+            border-radius: 20px;
+
+            background: rgba(255, 255, 255, 0.72);
+
+            color: #4f5d63;
+
+            font-size: 12px;
+            font-weight: 500;
+
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+
+            z-index: 10;
+
+            opacity: 0.75;
+        }
+
+
+        .music-toggle:hover {
+            opacity: 1;
+        }
+
+
+        /* ------------------------------
+           PIXEL HEARTS
+        ------------------------------ */
+
+        .heart-row {
+            display: flex;
+
+            justify-content: center;
+
+            gap: 10px;
+
+            margin-bottom: 20px;
+        }
+
+
+        .heart-icon {
+            width: 40px;
+
+            height: auto;
+
+            image-rendering: pixelated;
+        }
+
+
+        /* ------------------------------
+           RUPEE
+        ------------------------------ */
+
+        .pixel-rupee {
+            width: 34px;
+            height: 64px;
+
+            margin: 0 auto 25px;
+
+            background: #7ca58b;
+
+            clip-path: polygon(
+                50% 0%,
+                100% 25%,
+                100% 75%,
+                50% 100%,
+                0% 75%,
+                0% 25%
+            );
+
+            filter:
+                drop-shadow(3px 3px 0 #28414c);
+        }
+
+
+        /* ------------------------------
+           FINAL "YOUR MOVE" REVEAL
+        ------------------------------ */
+
+        .final-reveal {
+            margin-top: 24px;
+
+            padding-top: 20px;
+
+            border-top: 1px solid #d9dfdc;
+
+            animation: revealFade 0.7s ease;
+        }
+
+
+        .final-reveal p {
+            margin-top: 0;
+        }
+
+
+        .your-move {
+            margin-top: 18px !important;
+
+            margin-bottom: 0;
+
+            font-size: 15px;
+
+            font-weight: 500;
+
+            color: #7ca58b;
+        }
+
+
+        @keyframes revealFade {
+
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+        }
+
+
+        /* ------------------------------
+           HIDDEN CONTENT
+        ------------------------------ */
+
+        .hidden {
+            display: none;
+        }
+
+
+        /* ------------------------------
+           SMALL PHONE ADJUSTMENTS
+        ------------------------------ */
+
+        @media (max-width: 500px) {
+
+            .card {
+                width: 90%;
+
+                padding:
+                    30px
+                    25px;
+            }
+
+
+            h1 {
+                font-size: 28px;
+            }
+
+
+            p {
+                font-size: 17px;
+            }
+
+
+            .heart-icon {
+                width: 36px;
+            }
+
+
+            .music-toggle {
+                top: 12px;
+                right: 12px;
+
+                padding: 6px 10px;
+
+                font-size: 11px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+
+<body>
+
+
+    <!-- =================================
+         MUSIC ON / OFF
+    ================================= -->
+
+    <button
+        id="musicToggle"
+        class="music-toggle"
+        onclick="toggleMusic()"
+        aria-label="Turn background music on or off"
+    >
+        ♪ on
+    </button>
+
+
+
+    <main class="card">
+
+
+        <!-- =================================
+             SCREEN 1
+        ================================= -->
+
+        <section id="screen1">
+
+
+            <div class="symbol">
+                ↻
+            </div>
+
+
+            <h1>
+                let's restart?
+            </h1>
+
+
+            <p>
+                I'm not trying to rewrite what happened.
+            </p>
+
+
+            <p>
+                but I'm still sad about how things ended.
+            </p>
+
+
+            <p>
+                any chance of starting over as friends?
+            </p>
+
+
+            <button onclick="restartFriendship()">
+                maybe...
+            </button>
+
+
+            <button
+                class="secondary"
+                onclick="showScreen('screenNo')"
+            >
+                no thanks
+            </button>
+
+
+        </section>
+
+
+
+        <!-- =================================
+             SCREEN 2
+        ================================= -->
+
+        <section
+            id="screen2"
+            class="hidden"
+        >
+
+
+            <div class="heart-row">
+
+                <img
+                    src="images/heart.png"
+                    alt="pixel heart"
+                    class="heart-icon"
+                >
+
+                <img
+                    src="images/heart.png"
+                    alt="pixel heart"
+                    class="heart-icon"
+                >
+
+                <img
+                    src="images/heart.png"
+                    alt="pixel heart"
+                    class="heart-icon"
+                >
+
+            </div>
+
+
+            <h1>
+                what I mean by restart
+            </h1>
+
+
+            <p>
+                I want to be clear because I know I probably made things confusing in the past.
+            </p>
+
+
+            <p>
+                I'm not trying to restart anything romantic
+                or asking you to wait for me.
+                I'm choosing to stay single & focus on myself, but...
+            </p>
+
+
+            <p>
+                I think you were right about our paths crossing for a reason &
+                if friendship is something you'd want too,
+                I'd like the chance to start over.
+            </p>
+
+
+            <button onclick="showScreen('screen3')">
+                restart friendship
+            </button>
+
+
+        </section>
+
+
+
+        <!-- =================================
+             SCREEN 3
+        ================================= -->
+
+        <section
+            id="screen3"
+            class="hidden"
+        >
+
+
+            <div class="pixel-rupee"></div>
+
+
+            <h1>
+                that's really it.
+            </h1>
+
+
+            <p>
+                I'd be happy to have you in my life again.
+            </p>
+
+
+            <p>
+                but I also understand if friendship isn't something you want
+                or something that would feel good for you.
+            </p>
+
+
+            <p>
+                no pressure & no hard feelings either way.
+            </p>
+
+
+            <!--
+                Clicking this does NOT notify you
+                or send anything.
+
+                It simply reveals the final message.
+            -->
+
+            <button
+                id="revealButton"
+                onclick="revealMessage()"
+            >
+                one more thing
+            </button>
+
+
+            <div
+                id="finalReveal"
+                class="final-reveal hidden"
+            >
+
+                <p>
+                    if you'd like to restart too,
+                    just text me whenever you're ready.
+                </p>
+
+
+                <p class="your-move">
+                    your move ^^
+                </p>
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =================================
+             NO THANKS SCREEN
+        ================================= -->
+
+        <section
+            id="screenNo"
+            class="hidden"
+        >
+
+
+            <div class="symbol">
+                🤍
+            </div>
+
+
+            <h1>
+                das oki.
+            </h1>
+
+
+            <p>
+                I meant it when I said there's no pressure.
+            </p>
+
+
+            <p>
+                I apologize for any discomfort &
+                wish you all the best!
+            </p>
+
+
+        </section>
+
+
+    </main>
+
+
+
+    <!-- =================================
+         AUDIO
+    ================================= -->
+
+
+    <audio
+        id="restartSound"
+        src="audio/restart.mp3"
+        preload="auto"
+    ></audio>
+
+
+    <audio
+        id="backgroundMusic"
+        src="audio/background.mp3"
+        preload="auto"
+        loop
+    ></audio>
+
+
+
+    <!-- =================================
+         JAVASCRIPT
+    ================================= -->
+
+    <script>
+
+
+        /*
+            Keeps track of whether
+            background music is allowed.
+        */
+
+        let musicEnabled = true;
+
+
+        /*
+            Keeps track of whether the
+            background song has started.
+        */
+
+        let musicStarted = false;
+
+
+        /*
+            Stores our music fade timer.
+        */
+
+        let musicFadeInterval;
+
+
+
+        /* ------------------------------
+           CHANGE SCREENS WITH FADE
+        ------------------------------ */
+
+        function showScreen(screenId) {
+
+
+            const card =
+                document.querySelector(".card");
+
+
+            const screens =
+                document.querySelectorAll("section");
+
+
+            /*
+                Fade current card out
+            */
+
+            card.classList.add("fading");
+
+
+            /*
+                Wait for fade-out
+            */
+
+            setTimeout(function() {
+
+
+                /*
+                    Hide every screen
+                */
+
+                screens.forEach(function(screen) {
+
+                    screen.classList.add("hidden");
+
+                });
+
+
+                /*
+                    Show requested screen
+                */
+
+                document
+                    .getElementById(screenId)
+                    .classList.remove("hidden");
+
+
+                /*
+                    Fade new screen in
+                */
+
+                requestAnimationFrame(function() {
+
+                    card.classList.remove("fading");
+
+                });
+
+
+            }, 300);
+
+        }
+
+
+
+        /* ------------------------------
+           RESTART FRIENDSHIP BUTTON
+        ------------------------------ */
+
+        function restartFriendship() {
+
+
+            const restartSound =
+                document.getElementById("restartSound");
+
+
+            const backgroundMusic =
+                document.getElementById("backgroundMusic");
+
+
+            /*
+                Play little game sound
+            */
+
+            restartSound.volume = 0.35;
+
+            restartSound.currentTime = 0;
+
+            restartSound.play();
+
+
+            /*
+                Fade to Screen 2
+            */
+
+            showScreen("screen2");
+
+
+            /*
+                Background music is now
+                allowed to begin
+            */
+
+            musicStarted = true;
+
+
+            /*
+                Only play it if the
+                visitor has music turned on
+            */
+
+            if (musicEnabled) {
+
+                backgroundMusic.volume = 0;
+
+                backgroundMusic.play();
+
+                fadeInMusic(backgroundMusic);
+
+            }
+
+        }
+
+
+
+        /* ------------------------------
+           MUSIC ON / OFF
+        ------------------------------ */
+
+        function toggleMusic() {
+
+
+            const backgroundMusic =
+                document.getElementById("backgroundMusic");
+
+
+            const musicToggle =
+                document.getElementById("musicToggle");
+
+
+            musicEnabled = !musicEnabled;
+
+
+
+            /*
+                MUSIC OFF
+            */
+
+            if (!musicEnabled) {
+
+
+                clearInterval(musicFadeInterval);
+
+
+                backgroundMusic.pause();
+
+
+                musicToggle.textContent = "♪ off";
+
+            }
+
+
+
+            /*
+                MUSIC ON
+            */
+
+            else {
+
+
+                musicToggle.textContent = "♪ on";
+
+
+                /*
+                    Don't start the music
+                    until the visitor has
+                    clicked "maybe..."
+                */
+
+                if (musicStarted) {
+
+
+                    backgroundMusic.volume = 0;
+
+
+                    backgroundMusic.play();
+
+
+                    fadeInMusic(backgroundMusic);
+
+                }
+
+            }
+
+        }
+
+
+
+        /* ------------------------------
+           MUSIC FADE-IN
+        ------------------------------ */
+
+        function fadeInMusic(music) {
+
+
+            clearInterval(musicFadeInterval);
+
+
+            const targetVolume = 0.25;
+
+
+            const fadeDuration = 3000;
+
+
+            const steps = 50;
+
+
+            let currentStep = 0;
+
+
+
+            musicFadeInterval =
+                setInterval(function() {
+
+
+                    /*
+                        Stop fade if music
+                        gets turned off
+                    */
+
+                    if (!musicEnabled) {
+
+                        clearInterval(musicFadeInterval);
+
+                        return;
+
+                    }
+
+
+                    currentStep++;
+
+
+                    music.volume =
+                        targetVolume *
+                        (currentStep / steps);
+
+
+                    /*
+                        Stop at 25%
+                    */
+
+                    if (currentStep >= steps) {
+
+                        music.volume = targetVolume;
+
+                        clearInterval(musicFadeInterval);
+
+                    }
+
+
+                }, fadeDuration / steps);
+
+        }
+
+
+
+        /* ------------------------------
+           FINAL MESSAGE REVEAL
+        ------------------------------ */
+
+        function revealMessage() {
+
+
+            const reveal =
+                document.getElementById("finalReveal");
+
+
+            const button =
+                document.getElementById("revealButton");
+
+
+            /*
+                Hide "one more thing"
+            */
+
+            button.classList.add("hidden");
+
+
+            /*
+                Reveal final message
+            */
+
+            reveal.classList.remove("hidden");
+
+        }
+
+
+    </script>
+
+
+</body>
+
+</html>
